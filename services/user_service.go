@@ -24,7 +24,7 @@ var userSvcSingleton IUserService
 
 func InitUserService(h handlers.Handler) {
 	userSvcSingleton = userSvc{
-		UserRepo: repositories.NewJobRepositoryInstance(h.DB),
+		UserRepo: repositories.NewUserRepositoryInstance(h.DB),
 	}
 }
 

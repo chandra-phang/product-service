@@ -7,7 +7,8 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var dbClient *sql.DB
@@ -24,7 +25,8 @@ func InitConnection() *sql.DB {
 	dbPass := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
 
-	db, err := sql.Open("postgres", fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", dbHost, dbUser, dbPass, dbName, dbPort))
+	dbCon := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
+	db, err := sql.Open("mysql", dbCon)
 
 	if err != nil {
 		panic(err.Error())
