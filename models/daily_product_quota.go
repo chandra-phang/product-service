@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/labstack/echo/v4"
+)
 
 type DailyProductQuota struct {
 	ID          string
@@ -10,4 +14,11 @@ type DailyProductQuota struct {
 	Date        time.Time
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+}
+
+type IDailyProductQuotaRepository interface {
+	CreateDailyProductQuota(ctx echo.Context, dailyProductQuota DailyProductQuota) error
+	GetDailyProductQuota(ctx echo.Context, productID string, date time.Time) (*DailyProductQuota, error)
+	IncreaseDailyProductQuota(ctx echo.Context, productID string) error
+	DecreaseDailyProductQuota(ctx echo.Context, productID string) error
 }
