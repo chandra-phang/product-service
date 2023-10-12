@@ -7,14 +7,24 @@ import (
 )
 
 type Product struct {
-	ID         string    `json:"id"`
-	Name       string    `json:"name"`
-	DailyQuota int       `json:"dailyQuota"`
-	CreatedAt  time.Time `json:"createdAt"`
-	UpdatedAt  time.Time `json:"updatedAt"`
+	ID         string
+	Name       string
+	DailyQuota int
+	Status     ProductStatus
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 }
+
+type ProductStatus string
+
+const (
+	ProductEnabled  ProductStatus = "ENABLED"
+	ProductDisabled ProductStatus = "DISABLED"
+)
 
 type IProductRepository interface {
 	CreateProduct(ctx echo.Context, product Product) error
 	ListProducts(ctx echo.Context) ([]Product, error)
+	GetProduct(ctx echo.Context, productID string) (*Product, error)
+	UpdateProduct(ctx echo.Context, product Product) error
 }

@@ -64,3 +64,47 @@ func (c *productController) CreateProduct(ctx echo.Context) error {
 
 	return controller.WriteSuccess(ctx, http.StatusCreated, nil)
 }
+
+func (c *productController) GetProduct(ctx echo.Context) error {
+	productID := ctx.Param("id")
+
+	product, err := c.svc.GetProduct(ctx, productID)
+	if err != nil {
+		return controller.WriteError(ctx, http.StatusInternalServerError, err)
+	}
+
+	dto := new(v1response.GetProductDTO).ConvertFromProductEntity(product)
+
+	return controller.WriteSuccess(ctx, http.StatusOK, dto)
+}
+
+func (c *productController) UpdateProduct(ctx echo.Context) error {
+	productID := ctx.Param("id")
+
+	reqBody, _ := ioutil.ReadAll(ctx.Request().Body)
+	dto := v1request.UpdateProductDTO{}
+
+	if err := json.Unmarshal(reqBody, &dto); err != nil {
+		log.Errorf(ctx, err, "[ProductController][UpdateProduct] Failed to unmarshal request body %v into dto", reqBody)
+		return controller.WriteError(ctx, http.StatusBadRequest, err)
+	}
+
+	if err := json.Unmarshal(reqBody, &dto); err != nil {
+		log.Errorf(ctx, err, "[ProductController][UpdateProduct] Failed to unmarshal request body %v into dto", reqBody)
+		return controller.WriteError(ctx, http.StatusBadRequest, err)
+	}
+
+	err := dto.Validate(ctx)
+	if err != nil {
+		log.Errorf(ctx, err, "[ProductController][UpdateProduct] Validation failed for request dto %v ", dto)
+		return controller.WriteError(ctx, http.StatusBadRequest, err)
+	}
+
+	err = c.svc.UpdateProduct(ctx, productID, dto)
+	if err != nil {
+		log.Errorf(ctx, err, "[ProductController][UpdateProduct] Failed to create product for request dto %v ", dto)
+		return controller.WriteError(ctx, http.StatusInternalServerError, err)
+	}
+
+	return controller.WriteSuccess(ctx, http.StatusOK, nil)
+}

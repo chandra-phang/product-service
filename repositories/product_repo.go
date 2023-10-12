@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 	"shop-api/models"
 
@@ -21,15 +22,16 @@ func NewProductRepositoryInstance(db *sql.DB) models.IProductRepository {
 func (r ProductRepository) CreateProduct(ctx echo.Context, product models.Product) error {
 	sqlStatement := `
 		INSERT INTO products
-			(id, name, daily_quota, created_at, updated_at)
+			(id, name, daily_quota, status, created_at, updated_at)
 		VALUES
-			(?, ?, ?, ?, ?)
+			(?, ?, ?, ?, ?, ?)
 	`
 
 	params := []interface{}{
 		product.ID,
 		product.Name,
 		product.DailyQuota,
+		product.Status,
 		product.CreatedAt,
 		product.UpdatedAt,
 	}
@@ -48,13 +50,15 @@ func (r ProductRepository) ListProducts(ctx echo.Context) ([]models.Product, err
 			id,
 			name,
 			daily_quota,
+			status,
 			created_at,
 			updated_at
 		FROM products
+		WHERE status = ?
 		ORDER BY updated_at DESC
 	`
 
-	results, err := r.db.Query(sqlStatement)
+	results, err := r.db.Query(sqlStatement, models.ProductEnabled)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +66,7 @@ func (r ProductRepository) ListProducts(ctx echo.Context) ([]models.Product, err
 	var products = make([]models.Product, 0)
 	for results.Next() {
 		var product models.Product
-		err = results.Scan(&product.ID, &product.Name, &product.DailyQuota, &product.CreatedAt, &product.UpdatedAt)
+		err = results.Scan(&product.ID, &product.Name, &product.DailyQuota, &product.Status, &product.CreatedAt, &product.UpdatedAt)
 		if err != nil {
 			log.Println("failed to scan", err)
 			return nil, err
@@ -71,4 +75,63 @@ func (r ProductRepository) ListProducts(ctx echo.Context) ([]models.Product, err
 		products = append(products, product)
 	}
 	return products, nil
+}
+
+func (r ProductRepository) GetProduct(ctx echo.Context, productID string) (*models.Product, error) {
+	sqlStatement := `
+		SELECT
+			id,
+			name,
+			daily_quota,
+			status,
+			created_at,
+			updated_at
+		FROM products
+		WHERE id = ?
+	`
+
+	results, err := r.db.Query(sqlStatement, productID)
+	if err != nil {
+		return nil, err
+	}
+
+	var product models.Product
+	for results.Next() {
+		err = results.Scan(&product.ID, &product.Name, &product.DailyQuota, &product.Status, &product.CreatedAt, &product.UpdatedAt)
+		if err != nil {
+			log.Println("failed to scan", err)
+			return nil, err
+		}
+	}
+
+	if product.ID == "" {
+		return nil, errors.New("product not found")
+	}
+
+	return &product, nil
+}
+
+func (r ProductRepository) UpdateProduct(ctx echo.Context, product models.Product) error {
+	sqlStatement := `
+		UPDATE products
+		SET
+			name = ?,
+			daily_quota = ?,
+			updated_at = ?
+		WHERE id = ?
+	`
+
+	params := []interface{}{
+		product.Name,
+		product.DailyQuota,
+		product.UpdatedAt,
+		product.ID,
+	}
+
+	_, err := r.db.Exec(sqlStatement, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -9,6 +9,7 @@ type GetProductDTO struct {
 	ID         string `json:"id"`
 	Name       string `json:"name"`
 	DailyQuota int    `json:"dailyQuota"`
+	Status     string `json:"status"`
 	CreatedAt  int64  `json:"createdAt"`
 	UpdatedAt  int64  `json:"updatedAt"`
 }
@@ -22,6 +23,7 @@ func (dto *GetProductDTO) ConvertFromProductEntity(entity *models.Product) *GetP
 		ID:         entity.ID,
 		Name:       entity.Name,
 		DailyQuota: entity.DailyQuota,
+		Status:     string(entity.Status),
 		CreatedAt:  lib.ConvertToEpoch(entity.CreatedAt),
 		UpdatedAt:  lib.ConvertToEpoch(entity.UpdatedAt),
 	}
