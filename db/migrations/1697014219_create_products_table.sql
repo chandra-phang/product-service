@@ -1,4 +1,4 @@
-CREATE TABLE products (
+CREATE TABLE `products` (
   `id` varchar(100) PRIMARY KEY,
   `name` varchar(255) UNIQUE NOT NULL,
   `daily_quota` int,
