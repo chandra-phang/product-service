@@ -16,6 +16,7 @@ func InitRoutes() {
 	v1Api.POST("/products", productController.CreateProduct)
 	v1Api.GET("/products/:id", productController.GetProduct)
 	v1Api.PUT("/products/:id", productController.UpdateProduct)
+	v1Api.PUT("/products/:id/disable", productController.DisableProduct)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

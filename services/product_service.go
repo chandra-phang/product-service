@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	v1request "shop-api/dto/request/v1"
 	"shop-api/handlers"
 	"shop-api/lib"
@@ -17,6 +18,7 @@ type IProductService interface {
 	CreateProduct(ctx echo.Context, dto v1request.CreateProductDTO) error
 	GetProduct(ctx echo.Context, productID string) (*models.Product, error)
 	UpdateProduct(ctx echo.Context, productID string, dto v1request.UpdateProductDTO) error
+	DisableProduct(ctx echo.Context, productID string) error
 }
 
 type productSvc struct {
@@ -84,6 +86,24 @@ func (svc productSvc) UpdateProduct(ctx echo.Context, productID string, dto v1re
 	}
 
 	err = svc.ProductRepo.UpdateProduct(ctx, product)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (svc productSvc) DisableProduct(ctx echo.Context, productID string) error {
+	product, err := svc.ProductRepo.GetProduct(ctx, productID)
+	if err != nil {
+		return err
+	}
+
+	if product.Status == models.ProductDisabled {
+		return errors.New("product is already disabled")
+	}
+
+	err = svc.ProductRepo.DisableProduct(ctx, productID)
 	if err != nil {
 		return err
 	}

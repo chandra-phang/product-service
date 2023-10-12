@@ -135,3 +135,24 @@ func (r ProductRepository) UpdateProduct(ctx echo.Context, product models.Produc
 
 	return nil
 }
+
+func (r ProductRepository) DisableProduct(ctx echo.Context, productID string) error {
+	sqlStatement := `
+		UPDATE products
+		SET
+			status = ?
+		WHERE id = ?
+	`
+
+	params := []interface{}{
+		models.ProductDisabled,
+		productID,
+	}
+
+	_, err := r.db.Exec(sqlStatement, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
