@@ -4,7 +4,7 @@ package log
 // while supporting ctx.
 
 import (
-	"shop-api/lib"
+	"product-service/lib"
 
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"

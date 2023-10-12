@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"shop-api/lib"
-	"shop-api/models"
+	"product-service/lib"
+	"product-service/models"
 )
 
 type GetProductDTO struct {

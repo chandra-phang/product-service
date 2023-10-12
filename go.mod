@@ -1,4 +1,4 @@
-module shop-api
+module product-service
 
 go 1.18
 

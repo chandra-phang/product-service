@@ -2,11 +2,11 @@ package services
 
 import (
 	"errors"
-	v1request "shop-api/dto/request/v1"
-	"shop-api/handlers"
-	"shop-api/lib"
-	"shop-api/models"
-	"shop-api/repositories"
+	v1request "product-service/dto/request/v1"
+	"product-service/handlers"
+	"product-service/lib"
+	"product-service/models"
+	"product-service/repositories"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -19,6 +19,7 @@ type IProductService interface {
 	GetProduct(ctx echo.Context, productID string) (*models.Product, error)
 	UpdateProduct(ctx echo.Context, productID string, dto v1request.UpdateProductDTO) error
 	DisableProduct(ctx echo.Context, productID string) error
+	EnableProduct(ctx echo.Context, productID string) error
 }
 
 type productSvc struct {
@@ -104,6 +105,24 @@ func (svc productSvc) DisableProduct(ctx echo.Context, productID string) error {
 	}
 
 	err = svc.ProductRepo.DisableProduct(ctx, productID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (svc productSvc) EnableProduct(ctx echo.Context, productID string) error {
+	product, err := svc.ProductRepo.GetProduct(ctx, productID)
+	if err != nil {
+		return err
+	}
+
+	if product.Status == models.ProductEnabled {
+		return errors.New("product is already enabled")
+	}
+
+	err = svc.ProductRepo.EnableProduct(ctx, productID)
 	if err != nil {
 		return err
 	}

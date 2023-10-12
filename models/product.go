@@ -28,4 +28,5 @@ type IProductRepository interface {
 	GetProduct(ctx echo.Context, productID string) (*Product, error)
 	UpdateProduct(ctx echo.Context, product Product) error
 	DisableProduct(ctx echo.Context, productID string) error
+	EnableProduct(ctx echo.Context, productID string) error
 }

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"log"
-	"shop-api/models"
+	"product-service/models"
 
 	"github.com/labstack/echo/v4"
 )
@@ -146,6 +146,27 @@ func (r ProductRepository) DisableProduct(ctx echo.Context, productID string) er
 
 	params := []interface{}{
 		models.ProductDisabled,
+		productID,
+	}
+
+	_, err := r.db.Exec(sqlStatement, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r ProductRepository) EnableProduct(ctx echo.Context, productID string) error {
+	sqlStatement := `
+		UPDATE products
+		SET
+			status = ?
+		WHERE id = ?
+	`
+
+	params := []interface{}{
+		models.ProductEnabled,
 		productID,
 	}
 

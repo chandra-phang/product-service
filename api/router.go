@@ -1,7 +1,7 @@
 package api
 
 import (
-	v1 "shop-api/api/controller/v1"
+	v1 "product-service/api/controller/v1"
 
 	"github.com/labstack/echo/v4"
 )
@@ -17,6 +17,7 @@ func InitRoutes() {
 	v1Api.GET("/products/:id", productController.GetProduct)
 	v1Api.PUT("/products/:id", productController.UpdateProduct)
 	v1Api.PUT("/products/:id/disable", productController.DisableProduct)
+	v1Api.PUT("/products/:id/enable", productController.EnableProduct)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

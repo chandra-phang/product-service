@@ -1,10 +1,10 @@
 package app
 
 import (
-	"shop-api/api"
-	"shop-api/db"
-	"shop-api/handlers"
-	"shop-api/services"
+	"product-service/api"
+	"product-service/db"
+	"product-service/handlers"
+	"product-service/services"
 )
 
 type Application struct {

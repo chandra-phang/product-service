@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"shop-api/api/controller"
-	v1request "shop-api/dto/request/v1"
-	v1response "shop-api/dto/response/v1"
-	"shop-api/infrastructure/log"
-	"shop-api/services"
+	"product-service/api/controller"
+	v1request "product-service/dto/request/v1"
+	v1response "product-service/dto/response/v1"
+	"product-service/infrastructure/log"
+	"product-service/services"
 
 	"github.com/labstack/echo/v4"
 )
@@ -113,6 +113,17 @@ func (c *productController) DisableProduct(ctx echo.Context) error {
 	productID := ctx.Param("id")
 
 	err := c.svc.DisableProduct(ctx, productID)
+	if err != nil {
+		return controller.WriteError(ctx, http.StatusInternalServerError, err)
+	}
+
+	return controller.WriteSuccess(ctx, http.StatusOK, nil)
+}
+
+func (c *productController) EnableProduct(ctx echo.Context) error {
+	productID := ctx.Param("id")
+
+	err := c.svc.EnableProduct(ctx, productID)
 	if err != nil {
 		return controller.WriteError(ctx, http.StatusInternalServerError, err)
 	}

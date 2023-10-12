@@ -1,6 +1,6 @@
 package services
 
-import "shop-api/handlers"
+import "product-service/handlers"
 
 func InitServices(h handlers.Handler) {
 	InitProductService(h)

@@ -2,8 +2,8 @@ package request
 
 import (
 	"errors"
-	"shop-api/apperrors"
-	"shop-api/infrastructure/log"
+	"product-service/apperrors"
+	"product-service/infrastructure/log"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
