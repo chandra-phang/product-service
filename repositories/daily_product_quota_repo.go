@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"product-service/apperrors"
+	"product-service/lib"
 	"product-service/models"
 	"time"
 
@@ -59,7 +60,8 @@ func (r DailyProductQuotaRepository) GetDailyProductQuota(ctx echo.Context, prod
 		FROM daily_product_quotas
 		WHERE product_id = ? AND date = ?
 	`
-	params := []interface{}{productID, date}
+	dateString := lib.ConvertToDate(date)
+	params := []interface{}{productID, dateString}
 
 	results, err := r.db.Query(sqlStatement, params...)
 	if err != nil {

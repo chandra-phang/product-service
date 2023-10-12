@@ -21,6 +21,7 @@ type IProductService interface {
 	DisableProduct(ctx echo.Context, productID string) error
 	EnableProduct(ctx echo.Context, productID string) error
 	IncreaseBookedQuota(ctx echo.Context, productiD string) error
+	DecreaseBookedQuota(ctx echo.Context, productiD string) error
 }
 
 type productSvc struct {
@@ -161,10 +162,33 @@ func (svc productSvc) IncreaseBookedQuota(ctx echo.Context, productID string) er
 	}
 
 	if dailyProductQuota.BookedQuota >= dailyProductQuota.DailyQuota {
-		return apperrors.ErrProductBookedQuotaLimitReached
+		return apperrors.ErrProductBookedQuotaReachLimit
 	}
 
 	err = svc.DailyProductQuotaRepo.IncreaseDailyProductQuota(ctx, dailyProductQuota.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (svc productSvc) DecreaseBookedQuota(ctx echo.Context, productID string) error {
+	product, err := svc.ProductRepo.GetProduct(ctx, productID)
+	if err != nil {
+		return err
+	}
+
+	dailyProductQuota, err := svc.DailyProductQuotaRepo.GetDailyProductQuota(ctx, product.ID, time.Now())
+	if err != nil {
+		return err
+	}
+
+	if dailyProductQuota.BookedQuota <= 0 {
+		return apperrors.ErrProductBookedQuotaCannotDecrease
+	}
+
+	err = svc.DailyProductQuotaRepo.DecreaseDailyProductQuota(ctx, dailyProductQuota.ID)
 	if err != nil {
 		return err
 	}

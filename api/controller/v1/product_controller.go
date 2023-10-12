@@ -141,3 +141,14 @@ func (c *productController) IncreaseBookedQuota(ctx echo.Context) error {
 
 	return controller.WriteSuccess(ctx, http.StatusOK, nil)
 }
+
+func (c *productController) DecreaseBookedQuota(ctx echo.Context) error {
+	productID := ctx.Param("id")
+
+	err := c.svc.DecreaseBookedQuota(ctx, productID)
+	if err != nil {
+		return controller.WriteError(ctx, http.StatusInternalServerError, err)
+	}
+
+	return controller.WriteSuccess(ctx, http.StatusOK, nil)
+}

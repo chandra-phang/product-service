@@ -19,6 +19,7 @@ func InitRoutes() {
 	v1Api.PUT("/products/:id/disable", productController.DisableProduct)
 	v1Api.PUT("/products/:id/enable", productController.EnableProduct)
 	v1Api.PUT("/products/:id/increase-booked-quota", productController.IncreaseBookedQuota)
+	v1Api.PUT("/products/:id/decrease-booked-quota", productController.DecreaseBookedQuota)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

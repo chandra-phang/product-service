@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"log"
 	"product-service/apperrors"
+	"product-service/lib"
 	"product-service/models"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -47,18 +49,22 @@ func (r ProductRepository) CreateProduct(ctx echo.Context, product models.Produc
 func (r ProductRepository) ListProducts(ctx echo.Context) ([]models.Product, error) {
 	sqlStatement := `
 		SELECT
-			id,
-			name,
-			daily_quota,
-			status,
-			created_at,
-			updated_at
-		FROM products
-		WHERE status = ?
-		ORDER BY updated_at DESC
+			p.id,
+			p.name,
+			p.daily_quota,
+			p.status,
+			p.created_at,
+			p.updated_at
+		FROM products p
+		INNER JOIN daily_product_quotas dpq ON dpq.product_id = p.id AND dpq.date = ?
+		WHERE p.status = ? AND dpq.booked_quota < dpq.daily_quota
+		ORDER BY p.updated_at DESC
 	`
 
-	results, err := r.db.Query(sqlStatement, models.ProductEnabled)
+	currentDate := lib.ConvertToDate(time.Now())
+	params := []interface{}{currentDate, models.ProductEnabled}
+
+	results, err := r.db.Query(sqlStatement, params...)
 	if err != nil {
 		return nil, err
 	}
