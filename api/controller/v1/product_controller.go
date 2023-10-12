@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"shop-api/api/controller"
 	v1request "shop-api/dto/request/v1"
+	v1response "shop-api/dto/response/v1"
 	"shop-api/infrastructure/log"
 	"shop-api/services"
 
@@ -22,6 +23,17 @@ func InitProductController() *productController {
 	return &productController{
 		svc: services.GetProductService(),
 	}
+}
+
+func (c *productController) ListProducts(ctx echo.Context) error {
+	products, err := c.svc.ListProducts(ctx)
+	if err != nil {
+		return controller.WriteError(ctx, http.StatusInternalServerError, err)
+	}
+
+	dto := new(v1response.ListProductDTO).ConvertFromProductsEntity(products)
+
+	return controller.WriteSuccess(ctx, http.StatusOK, dto)
 }
 
 func (c *productController) CreateProduct(ctx echo.Context) error {

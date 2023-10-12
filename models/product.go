@@ -16,4 +16,5 @@ type Product struct {
 
 type IProductRepository interface {
 	CreateProduct(ctx echo.Context, product Product) error
+	ListProducts(ctx echo.Context) ([]Product, error)
 }

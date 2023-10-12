@@ -9,11 +9,11 @@ import (
 func InitRoutes() {
 	e := echo.New()
 
-	userController := v1.InitUserController()
 	productController := v1.InitProductController()
 
-	e.POST("/users", userController.CreateUser)
-	e.POST("/products", productController.CreateProduct)
+	v1Api := e.Group("v1")
+	v1Api.GET("/products", productController.ListProducts)
+	v1Api.POST("/products", productController.CreateProduct)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

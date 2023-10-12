@@ -13,6 +13,7 @@ import (
 
 type IProductService interface {
 	// svc CRUD methods for domain objects
+	ListProducts(ctx echo.Context) ([]models.Product, error)
 	CreateProduct(ctx echo.Context, dto v1request.CreateProductDTO) error
 }
 
@@ -46,4 +47,13 @@ func (svc productSvc) CreateProduct(ctx echo.Context, dto v1request.CreateProduc
 		return err
 	}
 	return nil
+}
+
+func (svc productSvc) ListProducts(ctx echo.Context) ([]models.Product, error) {
+	products, err := svc.ProductRepo.ListProducts(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return products, nil
 }

@@ -25,7 +25,7 @@ func InitConnection() *sql.DB {
 	dbPass := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
 
-	dbCon := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
+	dbCon := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", dbUser, dbPass, dbHost, dbPort, dbName)
 	db, err := sql.Open("mysql", dbCon)
 
 	if err != nil {
