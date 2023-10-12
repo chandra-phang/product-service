@@ -2,8 +2,8 @@ package repositories
 
 import (
 	"database/sql"
-	"errors"
 	"log"
+	"product-service/apperrors"
 	"product-service/models"
 
 	"github.com/labstack/echo/v4"
@@ -105,7 +105,7 @@ func (r ProductRepository) GetProduct(ctx echo.Context, productID string) (*mode
 	}
 
 	if product.ID == "" {
-		return nil, errors.New("product not found")
+		return nil, apperrors.ErrProductNotFound
 	}
 
 	return &product, nil

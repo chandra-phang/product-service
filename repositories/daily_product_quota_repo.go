@@ -2,8 +2,8 @@ package repositories
 
 import (
 	"database/sql"
-	"errors"
 	"log"
+	"product-service/apperrors"
 	"product-service/models"
 	"time"
 
@@ -61,7 +61,7 @@ func (r DailyProductQuotaRepository) GetDailyProductQuota(ctx echo.Context, prod
 	`
 	params := []interface{}{productID, date}
 
-	results, err := r.db.Query(sqlStatement, params)
+	results, err := r.db.Query(sqlStatement, params...)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (r DailyProductQuotaRepository) GetDailyProductQuota(ctx echo.Context, prod
 	}
 
 	if dailyProductQuota.ID == "" {
-		return nil, errors.New("daily_product_quota not found")
+		return nil, apperrors.ErrDailyProductQuotaNotFound
 	}
 
 	return &dailyProductQuota, nil

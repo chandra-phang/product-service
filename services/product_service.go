@@ -1,7 +1,7 @@
 package services
 
 import (
-	"errors"
+	"product-service/apperrors"
 	v1request "product-service/dto/request/v1"
 	"product-service/handlers"
 	"product-service/lib"
@@ -20,17 +20,20 @@ type IProductService interface {
 	UpdateProduct(ctx echo.Context, productID string, dto v1request.UpdateProductDTO) error
 	DisableProduct(ctx echo.Context, productID string) error
 	EnableProduct(ctx echo.Context, productID string) error
+	IncreaseBookedQuota(ctx echo.Context, productiD string) error
 }
 
 type productSvc struct {
-	ProductRepo models.IProductRepository
+	ProductRepo           models.IProductRepository
+	DailyProductQuotaRepo models.IDailyProductQuotaRepository
 }
 
 var productSvcSingleton IProductService
 
 func InitProductService(h handlers.Handler) {
 	productSvcSingleton = productSvc{
-		ProductRepo: repositories.NewProductRepositoryInstance(h.DB),
+		ProductRepo:           repositories.NewProductRepositoryInstance(h.DB),
+		DailyProductQuotaRepo: repositories.NewDailyProductQuotaRepositoryInstance(h.DB),
 	}
 }
 
@@ -101,7 +104,7 @@ func (svc productSvc) DisableProduct(ctx echo.Context, productID string) error {
 	}
 
 	if product.Status == models.ProductDisabled {
-		return errors.New("product is already disabled")
+		return apperrors.ErrProductAlreadyDisabled
 	}
 
 	err = svc.ProductRepo.DisableProduct(ctx, productID)
@@ -119,10 +122,49 @@ func (svc productSvc) EnableProduct(ctx echo.Context, productID string) error {
 	}
 
 	if product.Status == models.ProductEnabled {
-		return errors.New("product is already enabled")
+		return apperrors.ErrProductAlreadyEnabled
 	}
 
 	err = svc.ProductRepo.EnableProduct(ctx, productID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (svc productSvc) IncreaseBookedQuota(ctx echo.Context, productID string) error {
+	product, err := svc.ProductRepo.GetProduct(ctx, productID)
+	if err != nil {
+		return err
+	}
+
+	dailyProductQuota, err := svc.DailyProductQuotaRepo.GetDailyProductQuota(ctx, product.ID, time.Now())
+	if err != nil && err != apperrors.ErrDailyProductQuotaNotFound {
+		return err
+	}
+
+	if dailyProductQuota == nil {
+		dailyProductQuota = &models.DailyProductQuota{
+			ID:          lib.GenerateUUID(),
+			ProductID:   product.ID,
+			DailyQuota:  product.DailyQuota,
+			BookedQuota: 0,
+			Date:        time.Now(),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}
+		err = svc.DailyProductQuotaRepo.CreateDailyProductQuota(ctx, *dailyProductQuota)
+		if err != nil {
+			return err
+		}
+	}
+
+	if dailyProductQuota.BookedQuota >= dailyProductQuota.DailyQuota {
+		return apperrors.ErrProductBookedQuotaLimitReached
+	}
+
+	err = svc.DailyProductQuotaRepo.IncreaseDailyProductQuota(ctx, dailyProductQuota.ID)
 	if err != nil {
 		return err
 	}
