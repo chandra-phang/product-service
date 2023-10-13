@@ -2,7 +2,7 @@ package v1
 
 import (
 	"product-service/lib"
-	"product-service/models"
+	"product-service/model"
 )
 
 type GetProductDTO struct {
@@ -18,7 +18,7 @@ type ListProductDTO struct {
 	Products []GetProductDTO `json:"products"`
 }
 
-func (dto *GetProductDTO) ConvertFromProductEntity(entity *models.Product) *GetProductDTO {
+func (dto *GetProductDTO) ConvertFromProductEntity(entity *model.Product) *GetProductDTO {
 	return &GetProductDTO{
 		ID:         entity.ID,
 		Name:       entity.Name,
@@ -29,7 +29,7 @@ func (dto *GetProductDTO) ConvertFromProductEntity(entity *models.Product) *GetP
 	}
 }
 
-func (dto *ListProductDTO) ConvertFromProductsEntity(entities []models.Product) *ListProductDTO {
+func (dto *ListProductDTO) ConvertFromProductsEntity(entities []model.Product) *ListProductDTO {
 	resp := &ListProductDTO{}
 	for _, entity := range entities {
 		article := new(GetProductDTO).ConvertFromProductEntity(&entity)

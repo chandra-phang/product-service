@@ -1,6 +1,7 @@
 package api
 
 import (
+	"log"
 	v1 "product-service/api/controller/v1"
 
 	"github.com/labstack/echo/v4"
@@ -21,5 +22,6 @@ func InitRoutes() {
 	v1Api.PUT("/products/:id/increase-booked-quota", productController.IncreaseBookedQuota)
 	v1Api.PUT("/products/:id/decrease-booked-quota", productController.DecreaseBookedQuota)
 
+	log.Println("Server is running at 8080 port.")
 	e.Logger.Fatal(e.Start(":8080"))
 }

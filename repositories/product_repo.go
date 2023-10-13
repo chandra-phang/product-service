@@ -5,7 +5,7 @@ import (
 	"log"
 	"product-service/apperrors"
 	"product-service/lib"
-	"product-service/models"
+	"product-service/model"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -15,13 +15,13 @@ type ProductRepository struct {
 	db *sql.DB
 }
 
-func NewProductRepositoryInstance(db *sql.DB) models.IProductRepository {
+func NewProductRepositoryInstance(db *sql.DB) model.IProductRepository {
 	return &ProductRepository{
 		db: db,
 	}
 }
 
-func (r ProductRepository) CreateProduct(ctx echo.Context, product models.Product) error {
+func (r ProductRepository) CreateProduct(ctx echo.Context, product model.Product) error {
 	sqlStatement := `
 		INSERT INTO products
 			(id, name, daily_quota, status, created_at, updated_at)
@@ -46,7 +46,7 @@ func (r ProductRepository) CreateProduct(ctx echo.Context, product models.Produc
 	return nil
 }
 
-func (r ProductRepository) ListProducts(ctx echo.Context) ([]models.Product, error) {
+func (r ProductRepository) ListProducts(ctx echo.Context) ([]model.Product, error) {
 	sqlStatement := `
 		SELECT
 			p.id,
@@ -62,16 +62,16 @@ func (r ProductRepository) ListProducts(ctx echo.Context) ([]models.Product, err
 	`
 
 	currentDate := lib.ConvertToDate(time.Now())
-	params := []interface{}{currentDate, models.ProductEnabled}
+	params := []interface{}{currentDate, model.ProductEnabled}
 
 	results, err := r.db.Query(sqlStatement, params...)
 	if err != nil {
 		return nil, err
 	}
 
-	var products = make([]models.Product, 0)
+	var products = make([]model.Product, 0)
 	for results.Next() {
-		var product models.Product
+		var product model.Product
 		err = results.Scan(&product.ID, &product.Name, &product.DailyQuota, &product.Status, &product.CreatedAt, &product.UpdatedAt)
 		if err != nil {
 			log.Println("failed to scan", err)
@@ -83,7 +83,7 @@ func (r ProductRepository) ListProducts(ctx echo.Context) ([]models.Product, err
 	return products, nil
 }
 
-func (r ProductRepository) GetProduct(ctx echo.Context, productID string) (*models.Product, error) {
+func (r ProductRepository) GetProduct(ctx echo.Context, productID string) (*model.Product, error) {
 	sqlStatement := `
 		SELECT
 			id,
@@ -101,7 +101,7 @@ func (r ProductRepository) GetProduct(ctx echo.Context, productID string) (*mode
 		return nil, err
 	}
 
-	var product models.Product
+	var product model.Product
 	for results.Next() {
 		err = results.Scan(&product.ID, &product.Name, &product.DailyQuota, &product.Status, &product.CreatedAt, &product.UpdatedAt)
 		if err != nil {
@@ -117,7 +117,7 @@ func (r ProductRepository) GetProduct(ctx echo.Context, productID string) (*mode
 	return &product, nil
 }
 
-func (r ProductRepository) UpdateProduct(ctx echo.Context, product models.Product) error {
+func (r ProductRepository) UpdateProduct(ctx echo.Context, product model.Product) error {
 	sqlStatement := `
 		UPDATE products
 		SET
@@ -151,7 +151,7 @@ func (r ProductRepository) DisableProduct(ctx echo.Context, productID string) er
 	`
 
 	params := []interface{}{
-		models.ProductDisabled,
+		model.ProductDisabled,
 		productID,
 	}
 
@@ -172,7 +172,7 @@ func (r ProductRepository) EnableProduct(ctx echo.Context, productID string) err
 	`
 
 	params := []interface{}{
-		models.ProductEnabled,
+		model.ProductEnabled,
 		productID,
 	}
 

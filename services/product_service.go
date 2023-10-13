@@ -5,7 +5,7 @@ import (
 	v1request "product-service/dto/request/v1"
 	"product-service/handlers"
 	"product-service/lib"
-	"product-service/models"
+	"product-service/model"
 	"product-service/repositories"
 	"time"
 
@@ -14,9 +14,9 @@ import (
 
 type IProductService interface {
 	// svc CRUD methods for domain objects
-	ListProducts(ctx echo.Context) ([]models.Product, error)
+	ListProducts(ctx echo.Context) ([]model.Product, error)
 	CreateProduct(ctx echo.Context, dto v1request.CreateProductDTO) error
-	GetProduct(ctx echo.Context, productID string) (*models.Product, error)
+	GetProduct(ctx echo.Context, productID string) (*model.Product, error)
 	UpdateProduct(ctx echo.Context, productID string, dto v1request.UpdateProductDTO) error
 	DisableProduct(ctx echo.Context, productID string) error
 	EnableProduct(ctx echo.Context, productID string) error
@@ -25,8 +25,8 @@ type IProductService interface {
 }
 
 type productSvc struct {
-	ProductRepo           models.IProductRepository
-	DailyProductQuotaRepo models.IDailyProductQuotaRepository
+	ProductRepo           model.IProductRepository
+	DailyProductQuotaRepo model.IDailyProductQuotaRepository
 }
 
 var productSvcSingleton IProductService
@@ -43,11 +43,11 @@ func GetProductService() IProductService {
 }
 
 func (svc productSvc) CreateProduct(ctx echo.Context, dto v1request.CreateProductDTO) error {
-	product := models.Product{
+	product := model.Product{
 		ID:         lib.GenerateUUID(),
 		Name:       dto.Name,
 		DailyQuota: dto.DailyQuota,
-		Status:     models.ProductEnabled,
+		Status:     model.ProductEnabled,
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
 	}
@@ -59,7 +59,7 @@ func (svc productSvc) CreateProduct(ctx echo.Context, dto v1request.CreateProduc
 	return nil
 }
 
-func (svc productSvc) ListProducts(ctx echo.Context) ([]models.Product, error) {
+func (svc productSvc) ListProducts(ctx echo.Context) ([]model.Product, error) {
 	products, err := svc.ProductRepo.ListProducts(ctx)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func (svc productSvc) ListProducts(ctx echo.Context) ([]models.Product, error) {
 	return products, nil
 }
 
-func (svc productSvc) GetProduct(ctx echo.Context, productID string) (*models.Product, error) {
+func (svc productSvc) GetProduct(ctx echo.Context, productID string) (*model.Product, error) {
 	product, err := svc.ProductRepo.GetProduct(ctx, productID)
 	if err != nil {
 		return nil, err
@@ -83,7 +83,7 @@ func (svc productSvc) UpdateProduct(ctx echo.Context, productID string, dto v1re
 		return err
 	}
 
-	product := models.Product{
+	product := model.Product{
 		ID:         productID,
 		Name:       dto.Name,
 		DailyQuota: dto.DailyQuota,
@@ -104,7 +104,7 @@ func (svc productSvc) DisableProduct(ctx echo.Context, productID string) error {
 		return err
 	}
 
-	if product.Status == models.ProductDisabled {
+	if product.Status == model.ProductDisabled {
 		return apperrors.ErrProductAlreadyDisabled
 	}
 
@@ -122,7 +122,7 @@ func (svc productSvc) EnableProduct(ctx echo.Context, productID string) error {
 		return err
 	}
 
-	if product.Status == models.ProductEnabled {
+	if product.Status == model.ProductEnabled {
 		return apperrors.ErrProductAlreadyEnabled
 	}
 
@@ -146,7 +146,7 @@ func (svc productSvc) IncreaseBookedQuota(ctx echo.Context, productID string) er
 	}
 
 	if dailyProductQuota == nil {
-		dailyProductQuota = &models.DailyProductQuota{
+		dailyProductQuota = &model.DailyProductQuota{
 			ID:          lib.GenerateUUID(),
 			ProductID:   product.ID,
 			DailyQuota:  product.DailyQuota,

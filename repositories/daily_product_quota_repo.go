@@ -5,7 +5,7 @@ import (
 	"log"
 	"product-service/apperrors"
 	"product-service/lib"
-	"product-service/models"
+	"product-service/model"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -15,13 +15,13 @@ type DailyProductQuotaRepository struct {
 	db *sql.DB
 }
 
-func NewDailyProductQuotaRepositoryInstance(db *sql.DB) models.IDailyProductQuotaRepository {
+func NewDailyProductQuotaRepositoryInstance(db *sql.DB) model.IDailyProductQuotaRepository {
 	return &DailyProductQuotaRepository{
 		db: db,
 	}
 }
 
-func (r DailyProductQuotaRepository) CreateDailyProductQuota(ctx echo.Context, dailyProductQuota models.DailyProductQuota) error {
+func (r DailyProductQuotaRepository) CreateDailyProductQuota(ctx echo.Context, dailyProductQuota model.DailyProductQuota) error {
 	sqlStatement := `
 		INSERT INTO daily_product_quotas
 			(id, product_id, daily_quota, booked_quota, date, created_at, updated_at)
@@ -47,7 +47,7 @@ func (r DailyProductQuotaRepository) CreateDailyProductQuota(ctx echo.Context, d
 	return nil
 }
 
-func (r DailyProductQuotaRepository) GetDailyProductQuota(ctx echo.Context, productID string, date time.Time) (*models.DailyProductQuota, error) {
+func (r DailyProductQuotaRepository) GetDailyProductQuota(ctx echo.Context, productID string, date time.Time) (*model.DailyProductQuota, error) {
 	sqlStatement := `
 		SELECT
 			id,
@@ -68,7 +68,7 @@ func (r DailyProductQuotaRepository) GetDailyProductQuota(ctx echo.Context, prod
 		return nil, err
 	}
 
-	var dailyProductQuota models.DailyProductQuota
+	var dailyProductQuota model.DailyProductQuota
 	for results.Next() {
 		err = results.Scan(&dailyProductQuota.ID, &dailyProductQuota.ProductID, &dailyProductQuota.DailyQuota, &dailyProductQuota.BookedQuota, &dailyProductQuota.Date, &dailyProductQuota.CreatedAt, &dailyProductQuota.UpdatedAt)
 		if err != nil {
