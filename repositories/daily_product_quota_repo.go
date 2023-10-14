@@ -88,11 +88,12 @@ func (r DailyProductQuotaRepository) IncreaseDailyProductQuota(ctx echo.Context,
 	sqlStatement := `
 		UPDATE daily_product_quotas
 		SET
-			booked_quota = booked_quota + 1
+			booked_quota = booked_quota + 1, updated_at = ?
 		WHERE id = ?
 	`
 
-	_, err := r.db.Exec(sqlStatement, dailyProductQuotaID)
+	params := []interface{}{time.Now(), dailyProductQuotaID}
+	_, err := r.db.Exec(sqlStatement, params...)
 	if err != nil {
 		return err
 	}
@@ -104,11 +105,12 @@ func (r DailyProductQuotaRepository) DecreaseDailyProductQuota(ctx echo.Context,
 	sqlStatement := `
 		UPDATE daily_product_quotas
 		SET
-			booked_quota = booked_quota - 1
+			booked_quota = booked_quota - 1, updated_at = ?
 		WHERE id = ?
 	`
 
-	_, err := r.db.Exec(sqlStatement, dailyProductQuotaID)
+	params := []interface{}{time.Now(), dailyProductQuotaID}
+	_, err := r.db.Exec(sqlStatement, params...)
 	if err != nil {
 		return err
 	}

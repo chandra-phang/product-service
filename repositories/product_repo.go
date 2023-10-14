@@ -5,6 +5,7 @@ import (
 	"log"
 	"product-service/apperrors"
 	"product-service/model"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -140,12 +141,13 @@ func (r ProductRepository) DisableProduct(ctx echo.Context, productID string) er
 	sqlStatement := `
 		UPDATE products
 		SET
-			status = ?
+			status = ?, updated_at
 		WHERE id = ?
 	`
 
 	params := []interface{}{
 		model.ProductDisabled,
+		time.Now(),
 		productID,
 	}
 
@@ -161,12 +163,13 @@ func (r ProductRepository) EnableProduct(ctx echo.Context, productID string) err
 	sqlStatement := `
 		UPDATE products
 		SET
-			status = ?
+			status = ?, updated_at = ?
 		WHERE id = ?
 	`
 
 	params := []interface{}{
 		model.ProductEnabled,
+		time.Now(),
 		productID,
 	}
 
