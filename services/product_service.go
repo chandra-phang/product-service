@@ -25,16 +25,16 @@ type IProductService interface {
 }
 
 type productSvc struct {
-	ProductRepo           model.IProductRepository
-	DailyProductQuotaRepo model.IDailyProductQuotaRepository
+	productRepo           model.IProductRepository
+	dailyProductQuotaRepo model.IDailyProductQuotaRepository
 }
 
 var productSvcSingleton IProductService
 
 func InitProductService(h handlers.Handler) {
 	productSvcSingleton = productSvc{
-		ProductRepo:           repositories.NewProductRepositoryInstance(h.DB),
-		DailyProductQuotaRepo: repositories.NewDailyProductQuotaRepositoryInstance(h.DB),
+		productRepo:           repositories.NewProductRepositoryInstance(h.DB),
+		dailyProductQuotaRepo: repositories.NewDailyProductQuotaRepositoryInstance(h.DB),
 	}
 }
 
@@ -52,7 +52,7 @@ func (svc productSvc) CreateProduct(ctx echo.Context, dto v1request.CreateProduc
 		UpdatedAt:  time.Now(),
 	}
 
-	err := svc.ProductRepo.CreateProduct(ctx, product)
+	err := svc.productRepo.CreateProduct(ctx, product)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func (svc productSvc) CreateProduct(ctx echo.Context, dto v1request.CreateProduc
 }
 
 func (svc productSvc) ListProducts(ctx echo.Context) ([]model.Product, error) {
-	products, err := svc.ProductRepo.ListProducts(ctx)
+	products, err := svc.productRepo.ListProducts(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (svc productSvc) ListProducts(ctx echo.Context) ([]model.Product, error) {
 }
 
 func (svc productSvc) GetProduct(ctx echo.Context, productID string) (*model.Product, error) {
-	product, err := svc.ProductRepo.GetProduct(ctx, productID)
+	product, err := svc.productRepo.GetProduct(ctx, productID)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (svc productSvc) GetProduct(ctx echo.Context, productID string) (*model.Pro
 }
 
 func (svc productSvc) UpdateProduct(ctx echo.Context, productID string, dto v1request.UpdateProductDTO) error {
-	_, err := svc.ProductRepo.GetProduct(ctx, productID)
+	_, err := svc.productRepo.GetProduct(ctx, productID)
 	if err != nil {
 		return err
 	}
@@ -90,7 +90,7 @@ func (svc productSvc) UpdateProduct(ctx echo.Context, productID string, dto v1re
 		UpdatedAt:  time.Now(),
 	}
 
-	err = svc.ProductRepo.UpdateProduct(ctx, product)
+	err = svc.productRepo.UpdateProduct(ctx, product)
 	if err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ func (svc productSvc) UpdateProduct(ctx echo.Context, productID string, dto v1re
 }
 
 func (svc productSvc) DisableProduct(ctx echo.Context, productID string) error {
-	product, err := svc.ProductRepo.GetProduct(ctx, productID)
+	product, err := svc.productRepo.GetProduct(ctx, productID)
 	if err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func (svc productSvc) DisableProduct(ctx echo.Context, productID string) error {
 		return apperrors.ErrProductAlreadyDisabled
 	}
 
-	err = svc.ProductRepo.DisableProduct(ctx, productID)
+	err = svc.productRepo.DisableProduct(ctx, productID)
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func (svc productSvc) DisableProduct(ctx echo.Context, productID string) error {
 }
 
 func (svc productSvc) EnableProduct(ctx echo.Context, productID string) error {
-	product, err := svc.ProductRepo.GetProduct(ctx, productID)
+	product, err := svc.productRepo.GetProduct(ctx, productID)
 	if err != nil {
 		return err
 	}
@@ -126,7 +126,7 @@ func (svc productSvc) EnableProduct(ctx echo.Context, productID string) error {
 		return apperrors.ErrProductAlreadyEnabled
 	}
 
-	err = svc.ProductRepo.EnableProduct(ctx, productID)
+	err = svc.productRepo.EnableProduct(ctx, productID)
 	if err != nil {
 		return err
 	}
@@ -135,12 +135,12 @@ func (svc productSvc) EnableProduct(ctx echo.Context, productID string) error {
 }
 
 func (svc productSvc) IncreaseBookedQuota(ctx echo.Context, productID string) error {
-	product, err := svc.ProductRepo.GetProduct(ctx, productID)
+	product, err := svc.productRepo.GetProduct(ctx, productID)
 	if err != nil {
 		return err
 	}
 
-	dailyProductQuota, err := svc.DailyProductQuotaRepo.GetDailyProductQuota(ctx, product.ID, time.Now())
+	dailyProductQuota, err := svc.dailyProductQuotaRepo.GetDailyProductQuota(ctx, product.ID, time.Now())
 	if err != nil && err != apperrors.ErrDailyProductQuotaNotFound {
 		return err
 	}
@@ -155,7 +155,7 @@ func (svc productSvc) IncreaseBookedQuota(ctx echo.Context, productID string) er
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
 		}
-		err = svc.DailyProductQuotaRepo.CreateDailyProductQuota(ctx, *dailyProductQuota)
+		err = svc.dailyProductQuotaRepo.CreateDailyProductQuota(ctx, *dailyProductQuota)
 		if err != nil {
 			return err
 		}
@@ -165,7 +165,7 @@ func (svc productSvc) IncreaseBookedQuota(ctx echo.Context, productID string) er
 		return apperrors.ErrProductBookedQuotaReachLimit
 	}
 
-	err = svc.DailyProductQuotaRepo.IncreaseDailyProductQuota(ctx, dailyProductQuota.ID)
+	err = svc.dailyProductQuotaRepo.IncreaseDailyProductQuota(ctx, dailyProductQuota.ID)
 	if err != nil {
 		return err
 	}
@@ -174,12 +174,12 @@ func (svc productSvc) IncreaseBookedQuota(ctx echo.Context, productID string) er
 }
 
 func (svc productSvc) DecreaseBookedQuota(ctx echo.Context, productID string) error {
-	product, err := svc.ProductRepo.GetProduct(ctx, productID)
+	product, err := svc.productRepo.GetProduct(ctx, productID)
 	if err != nil {
 		return err
 	}
 
-	dailyProductQuota, err := svc.DailyProductQuotaRepo.GetDailyProductQuota(ctx, product.ID, time.Now())
+	dailyProductQuota, err := svc.dailyProductQuotaRepo.GetDailyProductQuota(ctx, product.ID, time.Now())
 	if err != nil {
 		return err
 	}
@@ -188,7 +188,7 @@ func (svc productSvc) DecreaseBookedQuota(ctx echo.Context, productID string) er
 		return apperrors.ErrProductBookedQuotaCannotDecrease
 	}
 
-	err = svc.DailyProductQuotaRepo.DecreaseDailyProductQuota(ctx, dailyProductQuota.ID)
+	err = svc.dailyProductQuotaRepo.DecreaseDailyProductQuota(ctx, dailyProductQuota.ID)
 	if err != nil {
 		return err
 	}
