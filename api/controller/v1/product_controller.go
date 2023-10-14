@@ -45,11 +45,6 @@ func (c *productController) CreateProduct(ctx echo.Context) error {
 		return controller.WriteError(ctx, http.StatusBadRequest, err)
 	}
 
-	if err := json.Unmarshal(reqBody, &dto); err != nil {
-		log.Errorf(ctx, err, "[ProductController][CreateProduct] Failed to unmarshal request body %v into dto", reqBody)
-		return controller.WriteError(ctx, http.StatusBadRequest, err)
-	}
-
 	err := dto.Validate(ctx)
 	if err != nil {
 		log.Errorf(ctx, err, "[ProductController][CreateProduct] Validation failed for request dto %v ", dto)
