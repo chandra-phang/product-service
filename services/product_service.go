@@ -125,6 +125,7 @@ func (svc productSvc) EnableProduct(ctx echo.Context, productID string) error {
 }
 
 func (svc productSvc) IncreaseBookedQuota(ctx echo.Context, dto v1request.IncreaseBookedQuotaDTO) error {
+	// add DB transaction
 	tx, _ := svc.dbCon.Begin()
 	defer tx.Rollback()
 
@@ -158,6 +159,7 @@ func (svc productSvc) IncreaseBookedQuota(ctx echo.Context, dto v1request.Increa
 		}
 	}
 
+	// commit the transaction
 	err := tx.Commit()
 	if err != nil {
 		return err
@@ -167,6 +169,7 @@ func (svc productSvc) IncreaseBookedQuota(ctx echo.Context, dto v1request.Increa
 }
 
 func (svc productSvc) DecreaseBookedQuota(ctx echo.Context, dto v1request.DecreaseBookedQuotaDTO) error {
+	// add DB transaction
 	tx, _ := svc.dbCon.Begin()
 	defer tx.Rollback()
 
@@ -192,6 +195,7 @@ func (svc productSvc) DecreaseBookedQuota(ctx echo.Context, dto v1request.Decrea
 		}
 	}
 
+	// commit the transaction
 	err := tx.Commit()
 	if err != nil {
 		return err
