@@ -5,9 +5,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	controller "product-service/api/controllers"
-	v1request "product-service/dto/request/v1"
-	v1response "product-service/dto/response/v1"
-	"product-service/infrastructure/log"
+	v1req "product-service/dto/request/v1"
+	v1resp "product-service/dto/response/v1"
 	"product-service/services"
 
 	"github.com/labstack/echo/v4"
@@ -31,29 +30,25 @@ func (c *productController) ListProducts(ctx echo.Context) error {
 		return controller.WriteError(ctx, http.StatusInternalServerError, err)
 	}
 
-	dto := new(v1response.ListProductDTO).ConvertFromProductsEntity(products)
-
-	return controller.WriteSuccess(ctx, http.StatusOK, dto)
+	resp := new(v1resp.ListProductDTO).ConvertFromProductsEntity(products)
+	return controller.WriteSuccess(ctx, http.StatusOK, resp)
 }
 
 func (c *productController) CreateProduct(ctx echo.Context) error {
 	reqBody, _ := ioutil.ReadAll(ctx.Request().Body)
-	dto := v1request.CreateProductDTO{}
+	dto := v1req.CreateProductDTO{}
 
 	if err := json.Unmarshal(reqBody, &dto); err != nil {
-		log.Errorf(ctx, err, "[ProductController][CreateProduct] Failed to unmarshal request body %v into dto", reqBody)
 		return controller.WriteError(ctx, http.StatusBadRequest, err)
 	}
 
 	err := dto.Validate(ctx)
 	if err != nil {
-		log.Errorf(ctx, err, "[ProductController][CreateProduct] Validation failed for request dto %v ", dto)
 		return controller.WriteError(ctx, http.StatusBadRequest, err)
 	}
 
 	err = c.svc.CreateProduct(ctx, dto)
 	if err != nil {
-		log.Errorf(ctx, err, "[ProductController][CreateProduct] Failed to create product for request dto %v ", dto)
 		return controller.WriteError(ctx, http.StatusInternalServerError, err)
 	}
 
@@ -68,7 +63,7 @@ func (c *productController) GetProduct(ctx echo.Context) error {
 		return controller.WriteError(ctx, http.StatusInternalServerError, err)
 	}
 
-	dto := new(v1response.GetProductDTO).ConvertFromProductEntity(product)
+	dto := new(v1resp.GetProductDTO).ConvertFromProductEntity(product)
 
 	return controller.WriteSuccess(ctx, http.StatusOK, dto)
 }
@@ -77,22 +72,19 @@ func (c *productController) UpdateProduct(ctx echo.Context) error {
 	productID := ctx.Param("id")
 
 	reqBody, _ := ioutil.ReadAll(ctx.Request().Body)
-	dto := v1request.UpdateProductDTO{}
+	dto := v1req.UpdateProductDTO{}
 
 	if err := json.Unmarshal(reqBody, &dto); err != nil {
-		log.Errorf(ctx, err, "[ProductController][UpdateProduct] Failed to unmarshal request body %v into dto", reqBody)
 		return controller.WriteError(ctx, http.StatusBadRequest, err)
 	}
 
 	err := dto.Validate(ctx)
 	if err != nil {
-		log.Errorf(ctx, err, "[ProductController][UpdateProduct] Validation failed for request dto %v ", dto)
 		return controller.WriteError(ctx, http.StatusBadRequest, err)
 	}
 
 	err = c.svc.UpdateProduct(ctx, productID, dto)
 	if err != nil {
-		log.Errorf(ctx, err, "[ProductController][UpdateProduct] Failed to create product for request dto %v ", dto)
 		return controller.WriteError(ctx, http.StatusInternalServerError, err)
 	}
 
@@ -123,16 +115,14 @@ func (c *productController) EnableProduct(ctx echo.Context) error {
 
 func (c *productController) IncreaseBookedQuota(ctx echo.Context) error {
 	reqBody, _ := ioutil.ReadAll(ctx.Request().Body)
-	dto := v1request.IncreaseBookedQuotaDTO{}
+	dto := v1req.IncreaseBookedQuotaDTO{}
 
 	if err := json.Unmarshal(reqBody, &dto); err != nil {
-		log.Errorf(ctx, err, "[ProductController][UpdateProduct] Failed to unmarshal request body %v into dto", reqBody)
 		return controller.WriteError(ctx, http.StatusBadRequest, err)
 	}
 
 	err := dto.Validate(ctx)
 	if err != nil {
-		log.Errorf(ctx, err, "[ProductController][UpdateProduct] Validation failed for request dto %v ", dto)
 		return controller.WriteError(ctx, http.StatusBadRequest, err)
 	}
 
@@ -146,16 +136,14 @@ func (c *productController) IncreaseBookedQuota(ctx echo.Context) error {
 
 func (c *productController) DecreaseBookedQuota(ctx echo.Context) error {
 	reqBody, _ := ioutil.ReadAll(ctx.Request().Body)
-	dto := v1request.DecreaseBookedQuotaDTO{}
+	dto := v1req.DecreaseBookedQuotaDTO{}
 
 	if err := json.Unmarshal(reqBody, &dto); err != nil {
-		log.Errorf(ctx, err, "[ProductController][UpdateProduct] Failed to unmarshal request body %v into dto", reqBody)
 		return controller.WriteError(ctx, http.StatusBadRequest, err)
 	}
 
 	err := dto.Validate(ctx)
 	if err != nil {
-		log.Errorf(ctx, err, "[ProductController][UpdateProduct] Validation failed for request dto %v ", dto)
 		return controller.WriteError(ctx, http.StatusBadRequest, err)
 	}
 
