@@ -19,6 +19,6 @@ type DailyProductQuota struct {
 type IDailyProductQuotaRepository interface {
 	CreateDailyProductQuota(ctx echo.Context, dailyProductQuota DailyProductQuota) error
 	GetDailyProductQuota(ctx echo.Context, productID string, date time.Time) (*DailyProductQuota, error)
-	IncreaseDailyProductQuota(ctx echo.Context, dailyProductQuotaID string) error
-	DecreaseDailyProductQuota(ctx echo.Context, dailyProductQuotaID string) error
+	IncreaseDailyProductQuota(ctx echo.Context, dailyProductQuotaID string, quantity int) error
+	DecreaseDailyProductQuota(ctx echo.Context, dailyProductQuotaID string, quantity int) error
 }

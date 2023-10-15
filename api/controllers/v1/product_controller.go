@@ -84,11 +84,6 @@ func (c *productController) UpdateProduct(ctx echo.Context) error {
 		return controller.WriteError(ctx, http.StatusBadRequest, err)
 	}
 
-	if err := json.Unmarshal(reqBody, &dto); err != nil {
-		log.Errorf(ctx, err, "[ProductController][UpdateProduct] Failed to unmarshal request body %v into dto", reqBody)
-		return controller.WriteError(ctx, http.StatusBadRequest, err)
-	}
-
 	err := dto.Validate(ctx)
 	if err != nil {
 		log.Errorf(ctx, err, "[ProductController][UpdateProduct] Validation failed for request dto %v ", dto)
@@ -127,9 +122,21 @@ func (c *productController) EnableProduct(ctx echo.Context) error {
 }
 
 func (c *productController) IncreaseBookedQuota(ctx echo.Context) error {
-	productID := ctx.Param("id")
+	reqBody, _ := ioutil.ReadAll(ctx.Request().Body)
+	dto := v1request.IncreaseBookedQuotaDTO{}
 
-	err := c.svc.IncreaseBookedQuota(ctx, productID)
+	if err := json.Unmarshal(reqBody, &dto); err != nil {
+		log.Errorf(ctx, err, "[ProductController][UpdateProduct] Failed to unmarshal request body %v into dto", reqBody)
+		return controller.WriteError(ctx, http.StatusBadRequest, err)
+	}
+
+	err := dto.Validate(ctx)
+	if err != nil {
+		log.Errorf(ctx, err, "[ProductController][UpdateProduct] Validation failed for request dto %v ", dto)
+		return controller.WriteError(ctx, http.StatusBadRequest, err)
+	}
+
+	err = c.svc.IncreaseBookedQuota(ctx, dto)
 	if err != nil {
 		return controller.WriteError(ctx, http.StatusInternalServerError, err)
 	}
@@ -138,9 +145,21 @@ func (c *productController) IncreaseBookedQuota(ctx echo.Context) error {
 }
 
 func (c *productController) DecreaseBookedQuota(ctx echo.Context) error {
-	productID := ctx.Param("id")
+	reqBody, _ := ioutil.ReadAll(ctx.Request().Body)
+	dto := v1request.DecreaseBookedQuotaDTO{}
 
-	err := c.svc.DecreaseBookedQuota(ctx, productID)
+	if err := json.Unmarshal(reqBody, &dto); err != nil {
+		log.Errorf(ctx, err, "[ProductController][UpdateProduct] Failed to unmarshal request body %v into dto", reqBody)
+		return controller.WriteError(ctx, http.StatusBadRequest, err)
+	}
+
+	err := dto.Validate(ctx)
+	if err != nil {
+		log.Errorf(ctx, err, "[ProductController][UpdateProduct] Validation failed for request dto %v ", dto)
+		return controller.WriteError(ctx, http.StatusBadRequest, err)
+	}
+
+	err = c.svc.DecreaseBookedQuota(ctx, dto)
 	if err != nil {
 		return controller.WriteError(ctx, http.StatusInternalServerError, err)
 	}

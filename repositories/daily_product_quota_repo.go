@@ -84,15 +84,15 @@ func (r DailyProductQuotaRepository) GetDailyProductQuota(ctx echo.Context, prod
 	return &dailyProductQuota, nil
 }
 
-func (r DailyProductQuotaRepository) IncreaseDailyProductQuota(ctx echo.Context, dailyProductQuotaID string) error {
+func (r DailyProductQuotaRepository) IncreaseDailyProductQuota(ctx echo.Context, dailyProductQuotaID string, quantity int) error {
 	sqlStatement := `
 		UPDATE daily_product_quotas
 		SET
-			booked_quota = booked_quota + 1, updated_at = ?
+			booked_quota = booked_quota + ?, updated_at = ?
 		WHERE id = ?
 	`
 
-	params := []interface{}{time.Now(), dailyProductQuotaID}
+	params := []interface{}{quantity, time.Now(), dailyProductQuotaID}
 	_, err := r.db.Exec(sqlStatement, params...)
 	if err != nil {
 		return err
@@ -101,15 +101,15 @@ func (r DailyProductQuotaRepository) IncreaseDailyProductQuota(ctx echo.Context,
 	return nil
 }
 
-func (r DailyProductQuotaRepository) DecreaseDailyProductQuota(ctx echo.Context, dailyProductQuotaID string) error {
+func (r DailyProductQuotaRepository) DecreaseDailyProductQuota(ctx echo.Context, dailyProductQuotaID string, quantity int) error {
 	sqlStatement := `
 		UPDATE daily_product_quotas
 		SET
-			booked_quota = booked_quota - 1, updated_at = ?
+			booked_quota = booked_quota - ?, updated_at = ?
 		WHERE id = ?
 	`
 
-	params := []interface{}{time.Now(), dailyProductQuotaID}
+	params := []interface{}{quantity, time.Now(), dailyProductQuotaID}
 	_, err := r.db.Exec(sqlStatement, params...)
 	if err != nil {
 		return err

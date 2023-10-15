@@ -48,15 +48,15 @@ func (r ProductRepository) CreateProduct(ctx echo.Context, product model.Product
 func (r ProductRepository) ListProducts(ctx echo.Context) ([]model.Product, error) {
 	sqlStatement := `
 		SELECT
-			p.id,
-			p.name,
-			p.daily_quota,
-			p.status,
-			p.created_at,
-			p.updated_at
-		FROM products p
-		WHERE p.status = ?
-		ORDER BY p.updated_at DESC
+			id,
+			name,
+			daily_quota,
+			status,
+			created_at,
+			updated_at
+		FROM products
+		WHERE status = ?
+		ORDER BY updated_at DESC
 	`
 
 	results, err := r.db.Query(sqlStatement, model.ProductEnabled)
@@ -141,7 +141,7 @@ func (r ProductRepository) DisableProduct(ctx echo.Context, productID string) er
 	sqlStatement := `
 		UPDATE products
 		SET
-			status = ?, updated_at
+			status = ?, updated_at = ?
 		WHERE id = ?
 	`
 
