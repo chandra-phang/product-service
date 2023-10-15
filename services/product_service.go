@@ -148,8 +148,9 @@ func (svc productSvc) IncreaseBookedQuota(ctx echo.Context, dto v1request.Increa
 			}
 		}
 
+		// validate bookedQuota + bookQuantity is not greater than dailyQuota limit
 		bookQuantity := productDTO.Quantity
-		if dailyProductQuota.BookedQuota+bookQuantity >= dailyProductQuota.DailyQuota {
+		if dailyProductQuota.BookedQuota+bookQuantity > dailyProductQuota.DailyQuota {
 			return apperrors.ErrProductBookedQuotaReachLimit
 		}
 
@@ -184,8 +185,9 @@ func (svc productSvc) DecreaseBookedQuota(ctx echo.Context, dto v1request.Decrea
 			return err
 		}
 
+		// validate bookedQuota - quantity is not bellow zero
 		quantity := productDTO.Quantity
-		if dailyProductQuota.BookedQuota-quantity <= 0 {
+		if dailyProductQuota.BookedQuota-quantity < 0 {
 			return apperrors.ErrProductBookedQuotaCannotDecrease
 		}
 
