@@ -2,7 +2,7 @@ package api
 
 import (
 	"log"
-	v1 "product-service/api/controller/v1"
+	v1 "product-service/api/controllers/v1"
 
 	"github.com/labstack/echo/v4"
 )

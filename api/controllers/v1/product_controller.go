@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"product-service/api/controller"
+	controller "product-service/api/controllers"
 	v1request "product-service/dto/request/v1"
 	v1response "product-service/dto/response/v1"
 	"product-service/infrastructure/log"
