@@ -34,7 +34,7 @@ func (r DailyProductQuotaRepository) CreateDailyProductQuota(ctx echo.Context, d
 		dailyProductQuota.ProductID,
 		dailyProductQuota.DailyQuota,
 		dailyProductQuota.BookedQuota,
-		dailyProductQuota.Date,
+		lib.ConvertToDate(dailyProductQuota.Date),
 		dailyProductQuota.CreatedAt,
 		dailyProductQuota.UpdatedAt,
 	}
