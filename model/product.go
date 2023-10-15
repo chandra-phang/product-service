@@ -1,6 +1,7 @@
 package model
 
 import (
+	"product-service/lib"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -21,6 +22,17 @@ const (
 	ProductEnabled  ProductStatus = "ENABLED"
 	ProductDisabled ProductStatus = "DISABLED"
 )
+
+func (Product) Initialize(name string, dailyQuota int) *Product {
+	return &Product{
+		ID:         lib.GenerateUUID(),
+		Name:       name,
+		DailyQuota: dailyQuota,
+		Status:     ProductEnabled,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
+	}
+}
 
 type IProductRepository interface {
 	CreateProduct(ctx echo.Context, product Product) error

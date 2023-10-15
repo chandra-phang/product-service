@@ -6,7 +6,6 @@ import (
 	"product-service/db"
 	v1request "product-service/dto/request/v1"
 	"product-service/handlers"
-	"product-service/lib"
 	"product-service/model"
 	"product-service/repositories"
 	"time"
@@ -47,16 +46,8 @@ func GetProductService() IProductService {
 }
 
 func (svc productSvc) CreateProduct(ctx echo.Context, dto v1request.CreateProductDTO) error {
-	product := model.Product{
-		ID:         lib.GenerateUUID(),
-		Name:       dto.Name,
-		DailyQuota: dto.DailyQuota,
-		Status:     model.ProductEnabled,
-		CreatedAt:  time.Now(),
-		UpdatedAt:  time.Now(),
-	}
-
-	err := svc.productRepo.CreateProduct(ctx, product)
+	product := new(model.Product).Initialize(dto.Name, dto.DailyQuota)
+	err := svc.productRepo.CreateProduct(ctx, *product)
 	if err != nil {
 		return err
 	}
@@ -68,7 +59,6 @@ func (svc productSvc) ListProducts(ctx echo.Context) ([]model.Product, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return products, nil
 }
 
@@ -77,24 +67,20 @@ func (svc productSvc) GetProduct(ctx echo.Context, productID string) (*model.Pro
 	if err != nil {
 		return nil, err
 	}
-
 	return product, nil
 }
 
 func (svc productSvc) UpdateProduct(ctx echo.Context, productID string, dto v1request.UpdateProductDTO) error {
-	_, err := svc.productRepo.GetProduct(ctx, productID)
+	product, err := svc.productRepo.GetProduct(ctx, productID)
 	if err != nil {
 		return err
 	}
 
-	product := model.Product{
-		ID:         productID,
-		Name:       dto.Name,
-		DailyQuota: dto.DailyQuota,
-		UpdatedAt:  time.Now(),
-	}
+	product.Name = dto.Name
+	product.DailyQuota = dto.DailyQuota
+	product.UpdatedAt = time.Now()
 
-	err = svc.productRepo.UpdateProduct(ctx, product)
+	err = svc.productRepo.UpdateProduct(ctx, *product)
 	if err != nil {
 		return err
 	}
@@ -154,15 +140,7 @@ func (svc productSvc) IncreaseBookedQuota(ctx echo.Context, dto v1request.Increa
 		}
 
 		if dailyProductQuota == nil {
-			dailyProductQuota = &model.DailyProductQuota{
-				ID:          lib.GenerateUUID(),
-				ProductID:   product.ID,
-				DailyQuota:  product.DailyQuota,
-				BookedQuota: 0,
-				Date:        time.Now(),
-				CreatedAt:   time.Now(),
-				UpdatedAt:   time.Now(),
-			}
+			dailyProductQuota = new(model.DailyProductQuota).Initialize(product.ID, product.DailyQuota)
 			err = svc.dailyProductQuotaRepo.CreateDailyProductQuota(ctx, *dailyProductQuota)
 			if err != nil {
 				return err

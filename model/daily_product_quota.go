@@ -1,6 +1,7 @@
 package model
 
 import (
+	"product-service/lib"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -14,6 +15,18 @@ type DailyProductQuota struct {
 	Date        time.Time
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+}
+
+func (DailyProductQuota) Initialize(productID string, dailyQuota int) *DailyProductQuota {
+	return &DailyProductQuota{
+		ID:          lib.GenerateUUID(),
+		ProductID:   productID,
+		DailyQuota:  dailyQuota,
+		BookedQuota: 0,
+		Date:        time.Now(),
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
 }
 
 type IDailyProductQuotaRepository interface {
