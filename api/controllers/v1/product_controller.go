@@ -35,14 +35,17 @@ func (c *productController) ListProducts(ctx echo.Context) error {
 }
 
 func (c *productController) CreateProduct(ctx echo.Context) error {
-	reqBody, _ := ioutil.ReadAll(ctx.Request().Body)
-	dto := v1req.CreateProductDTO{}
+	reqBody, err := ioutil.ReadAll(ctx.Request().Body)
+	if err != nil {
+		return controller.WriteError(ctx, http.StatusBadRequest, err)
+	}
 
+	dto := v1req.CreateProductDTO{}
 	if err := json.Unmarshal(reqBody, &dto); err != nil {
 		return controller.WriteError(ctx, http.StatusBadRequest, err)
 	}
 
-	err := dto.Validate(ctx)
+	err = dto.Validate(ctx)
 	if err != nil {
 		return controller.WriteError(ctx, http.StatusBadRequest, err)
 	}
@@ -57,28 +60,28 @@ func (c *productController) CreateProduct(ctx echo.Context) error {
 
 func (c *productController) GetProduct(ctx echo.Context) error {
 	productID := ctx.Param("id")
-
 	product, err := c.svc.GetProduct(ctx, productID)
 	if err != nil {
 		return controller.WriteError(ctx, http.StatusInternalServerError, err)
 	}
 
-	dto := new(v1resp.GetProductDTO).ConvertFromProductEntity(product)
-
-	return controller.WriteSuccess(ctx, http.StatusOK, dto)
+	resp := new(v1resp.GetProductDTO).ConvertFromProductEntity(product)
+	return controller.WriteSuccess(ctx, http.StatusOK, resp)
 }
 
 func (c *productController) UpdateProduct(ctx echo.Context) error {
 	productID := ctx.Param("id")
+	reqBody, err := ioutil.ReadAll(ctx.Request().Body)
+	if err != nil {
+		return controller.WriteError(ctx, http.StatusBadRequest, err)
+	}
 
-	reqBody, _ := ioutil.ReadAll(ctx.Request().Body)
 	dto := v1req.UpdateProductDTO{}
-
 	if err := json.Unmarshal(reqBody, &dto); err != nil {
 		return controller.WriteError(ctx, http.StatusBadRequest, err)
 	}
 
-	err := dto.Validate(ctx)
+	err = dto.Validate(ctx)
 	if err != nil {
 		return controller.WriteError(ctx, http.StatusBadRequest, err)
 	}
@@ -93,7 +96,6 @@ func (c *productController) UpdateProduct(ctx echo.Context) error {
 
 func (c *productController) DisableProduct(ctx echo.Context) error {
 	productID := ctx.Param("id")
-
 	err := c.svc.DisableProduct(ctx, productID)
 	if err != nil {
 		return controller.WriteError(ctx, http.StatusInternalServerError, err)
@@ -104,7 +106,6 @@ func (c *productController) DisableProduct(ctx echo.Context) error {
 
 func (c *productController) EnableProduct(ctx echo.Context) error {
 	productID := ctx.Param("id")
-
 	err := c.svc.EnableProduct(ctx, productID)
 	if err != nil {
 		return controller.WriteError(ctx, http.StatusInternalServerError, err)
@@ -114,14 +115,17 @@ func (c *productController) EnableProduct(ctx echo.Context) error {
 }
 
 func (c *productController) IncreaseBookedQuota(ctx echo.Context) error {
-	reqBody, _ := ioutil.ReadAll(ctx.Request().Body)
-	dto := v1req.IncreaseBookedQuotaDTO{}
+	reqBody, err := ioutil.ReadAll(ctx.Request().Body)
+	if err != nil {
+		return controller.WriteError(ctx, http.StatusBadRequest, err)
+	}
 
+	dto := v1req.IncreaseBookedQuotaDTO{}
 	if err := json.Unmarshal(reqBody, &dto); err != nil {
 		return controller.WriteError(ctx, http.StatusBadRequest, err)
 	}
 
-	err := dto.Validate(ctx)
+	err = dto.Validate(ctx)
 	if err != nil {
 		return controller.WriteError(ctx, http.StatusBadRequest, err)
 	}
@@ -135,14 +139,17 @@ func (c *productController) IncreaseBookedQuota(ctx echo.Context) error {
 }
 
 func (c *productController) DecreaseBookedQuota(ctx echo.Context) error {
-	reqBody, _ := ioutil.ReadAll(ctx.Request().Body)
-	dto := v1req.DecreaseBookedQuotaDTO{}
+	reqBody, err := ioutil.ReadAll(ctx.Request().Body)
+	if err != nil {
+		return controller.WriteError(ctx, http.StatusBadRequest, err)
+	}
 
+	dto := v1req.DecreaseBookedQuotaDTO{}
 	if err := json.Unmarshal(reqBody, &dto); err != nil {
 		return controller.WriteError(ctx, http.StatusBadRequest, err)
 	}
 
-	err := dto.Validate(ctx)
+	err = dto.Validate(ctx)
 	if err != nil {
 		return controller.WriteError(ctx, http.StatusBadRequest, err)
 	}
